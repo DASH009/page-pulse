@@ -16,8 +16,8 @@ function App() {
     setResults(null);
 
     try {
-      // Send the URL to our Express backend running on port 3000
-      const response = await fetch('http://localhost:3000/audit', {
+      // Send the URL to our live Express backend on Render
+      const response = await fetch('https://page-pulse-qg9b.onrender.com/audit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
