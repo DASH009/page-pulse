@@ -1,49 +1,57 @@
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');     // Added Axios
-const cheerio = require('cheerio'); // Added Cheerio
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Our basic test route
+// Health Check Endpoint (Render uses this to check if server is running)
 app.get('/', (req, res) => {
-  res.json({ message: "PagePulse Backend is up and running!" });
+  res.status(200).json({ status: 'online', message: 'PagePulse API is running smoothly!' });
 });
 
-// THE NEW AUDIT ROUTE
+// Audit Endpoint
 app.post('/audit', async (req, res) => {
-  // 1. Get the URL sent by the frontend
   const { url } = req.body;
 
-  try {
-    // 2. Start a timer, then use Axios to fetch the website's HTML
-    const startTime = Date.now();
-    const response = await axios.get(url);
-    const endTime = Date.now();
+  // 1. Backend Input Validation
+  if (!url) {
+    return res.status(400).json({ error: 'URL is required in the request body.' });
+  }
 
-    // 3. Load the downloaded HTML into Cheerio so we can query it
+  try {
+    const startTime = Date.now();
+    
+    // Fetch target webpage with a custom user-agent to prevent blocking
+    const response = await axios.get(url, {
+      timeout: 10000, // 10 seconds timeout
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+
+    const responseTime = Date.now() - startTime;
     const html = response.data;
     const $ = cheerio.load(html);
 
-    // 4. Extract the exact data the assessment requires
-    const status = response.status; // HTTP status code (e.g., 200)
-    const responseTime = endTime - startTime; // Time in milliseconds
-    const title = $('title').text() || 'No Title Found';
-    const description = $('meta[name="description"]').attr('content') || 'No Description Found';
-    const h1 = $('h1').first().text() || 'No H1 Found';
+    // Extract SEO metrics
+    const title = $('title').text().trim() || 'No title found';
+    const description = $('meta[name="description"]').attr('content')?.trim() || 'No meta description found';
+    const h1 = $('h1').first().text().trim() || 'No H1 heading found';
     
-    // Extract text from the body, split it by spaces to get words, and count them
-    const textContent = $('body').text();
-    const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
+    // Calculate approximate word count from body text
+    const bodyText = $('body').text();
+    const wordCount = bodyText ? bodyText.split(/\s+/).filter(Boolean).length : 0;
 
-    // 5. Send all this beautiful data back to the frontend as JSON
-    res.json({
+    // Send structured professional JSON response
+    return res.status(200).json({
       url,
-      status,
+      status: response.status,
       responseTime,
       title,
       description,
@@ -51,19 +59,29 @@ app.post('/audit', async (req, res) => {
       wordCount
     });
 
-  } catch (error) {
-    // 6. ERROR HANDLING: If the URL is invalid or broken, catch it safely
-    console.error("Audit Error:", error.message);
-    res.status(500).json({ error: "Failed to audit the URL. Please check if it is correct." });
+  } catch (err) {
+    console.error(`Audit error for URL ${url}:`, err.message);
+
+    // Professional error mapping for backend failures
+    let statusCode = 500;
+    let errorMessage = 'Failed to analyze the website.';
+
+    if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN') {
+      statusCode = 404;
+      errorMessage = 'Website unreachable or domain does not exist.';
+    } else if (err.code === 'ECONNABORTED') {
+      statusCode = 504;
+      errorMessage = 'Gateway Timeout: The target website took too long to respond.';
+    } else if (err.response) {
+      statusCode = err.response.status;
+      errorMessage = `Target website responded with status code ${err.response.status}`;
+    }
+
+    return res.status(statusCode).json({ error: errorMessage });
   }
 });
 
-// Only start the server if we are NOT running a test
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
-}
-
-// Export the app so Jest can test it
-module.exports = app;
+// Start Server
+app.listen(PORT, () => {
+  console.log(`PagePulse backend server running on port ${PORT}`);
+});

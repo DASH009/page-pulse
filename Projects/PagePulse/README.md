@@ -1,27 +1,47 @@
 # PagePulse ⚡
 
-PagePulse is a modern, full-stack web application designed to audit the SEO and performance metrics of any given website. Simply enter a URL, and the application instantly scrapes and analyzes the target page, returning key data points in a clean, responsive dashboard.
+> A modern, full-stack website SEO and performance auditing tool built for developers and digital creators.
 
-## 🚀 Features
+![Project Status](https://img.shields.io/badge/Status-Live%20%26%20Production%20Ready-success)
+![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node.js%20%7C%20Express%20%7C%20Cheerio-blue)
 
-* **Real-time Web Scraping:** Extracts page titles, meta descriptions, H1 tags, and word counts instantly.
-* **Performance Tracking:** Calculates server response times and HTTP status codes.
-* **Modern UI:** A clean, responsive React frontend built with Vite.
-* **Robust Backend:** An Express.js REST API utilizing Axios and Cheerio for efficient HTML parsing.
-* **Automated Testing:** Fully tested backend endpoints using Jest and Supertest.
+---
+
+## 🚀 Overview
+**PagePulse** is a full-stack web application designed to analyze target web pages instantly. It performs real-time web scraping to extract vital on-page SEO metrics—including HTTP status, response time, page title, meta description, primary H1 heading, and approximate word count—delivering clean insights through a sleek SaaS-style dashboard.
+
+---
+
+## ✨ Features
+* **Instant SEO Audit:** Extracts title tags, meta descriptions, H1 headings, and word counts using server-side scraping.
+* **Performance Metrics:** Measures real-time server response times (ms) and HTTP status codes.
+* **Client-Side Validation:** Validates URLs securely before sending requests to save bandwidth and server load.
+* **Professional Error Handling:** Maps network failures, timeouts, and unreachable URLs to user-friendly messages.
+* **Responsive SaaS UI:** Designed with a minimalist, modern aesthetic that looks stunning on desktop, tablet, and mobile devices.
+
+---
 
 ## 🛠️ Tech Stack
-
-* **Frontend:** React, Vite, CSS3
+* **Frontend:** React, Vite, JavaScript, CSS3
 * **Backend:** Node.js, Express.js
-* **Scraping & Data:** Axios, Cheerio
-* **Testing:** Jest, Supertest
+* **Scraping & Parsing:** Axios, Cheerio
+* **Deployment:** Vercel (Frontend) & Render (Backend)
 
-## 💻 Running the Project Locally
+---
 
-### 1. Start the Backend Server
-Navigate to the backend directory, install dependencies, and start the Express server on port 3000.
-```bash
-cd backend
-npm install
-node server.js
+## 📁 Folder Structure
+```text
+PagePulse/
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   └── main.jsx
+│   ├── .env
+│   ├── package.json
+│   └── vite.config.js
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   └── .gitignore
+└── README.md

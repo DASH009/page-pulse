@@ -15,9 +15,22 @@ function App() {
     setError('');
     setResults(null);
 
+    // 1. Professional URL Validation
     try {
-      // Send the URL to our live Express backend on Render
-      const response = await fetch('https://page-pulse-qg9b.onrender.com/audit', {
+      const parsedUrl = new URL(url);
+      if (!parsedUrl.protocol.startsWith('http')) {
+        throw new Error('Invalid URL protocol.');
+      }
+    } catch (_) {
+      setError('⚠️ Please enter a valid URL including http:// or https:// (e.g., https://example.com)');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+      const response = await fetch(`${API_URL}/audit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,15 +41,19 @@ function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to analyze the website.');
+        throw new Error(data.error || 'Server unavailable or website unreachable.');
       }
 
-      // Store the backend's response in state
       setResults(data);
     } catch (err) {
-      setError(err.message);
+      // 2. Professional Error Mapping
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        setError('🌐 Network error: Unable to connect to the backend server.');
+      } else {
+        setError(`❌ ${err.message}`);
+      }
     } finally {
-      setLoading(false); // Turn off loading spinner
+      setLoading(false);
     }
   };
 
@@ -48,16 +65,28 @@ function App() {
       {/* Input Form */}
       <form onSubmit={handleAudit} className="search-form">
         <input 
-          type="url" 
+          type="text" 
           placeholder="https://example.com" 
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required 
         />
         <button type="submit" disabled={loading}>
-          {loading ? 'Auditing...' : 'Audit'}
+          {loading ? (
+            <span className="btn-loading-content">
+              <span className="spinner"></span> Auditing...
+            </span>
+          ) : 'Audit'}
         </button>
       </form>
+
+      {/* Modern Loading State Card */}
+      {loading && (
+        <div className="loading-card-pulse">
+          <div className="spinner-large"></div>
+          <p>Analyzing website structure, metadata, and performance...</p>
+        </div>
+      )}
 
       {/* Error Banner */}
       {error && <div className="error-card">{error}</div>}

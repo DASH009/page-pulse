@@ -159,3 +159,49 @@ button:disabled {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* Modern Loading Spinner & Card */
+.btn-loading-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-card-pulse {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  border-radius: 12px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  color: #64748b;
+}
+
+.spinner-large {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #3b82f6;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
