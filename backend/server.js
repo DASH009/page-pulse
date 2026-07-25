@@ -4,7 +4,7 @@ const axios = require('axios');     // Added Axios
 const cheerio = require('cheerio'); // Added Cheerio
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
